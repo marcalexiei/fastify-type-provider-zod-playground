@@ -14,20 +14,23 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  # check:
-  #   name: Code check
-  #   timeout-minutes: 5
-  #   runs-on: ubuntu-latest
+  check:
+    name: Code check
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
 
-  #     - name: Install Dependencies
-  #       uses: ./.github/actions/install-dependencies
+      - name: Install Dependencies
+        uses: ./.github/actions/install-dependencies
 
-  #     - name: Format
-  #       run: pnpm run lint
+      - name: Lint
+        run: pnpm run format
+
+      - name: Lint
+        run: pnpm run lint
 
   test:
     name: Test Node ${{ matrix.node-version }} on ${{ matrix.os }}
@@ -40,7 +43,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install Dependencies
         uses: ./.github/actions/install-dependencies
@@ -59,7 +62,7 @@ jobs:
     timeout-minutes: 1
     if: always()
     needs:
-      # - check
+      - check
       - test
     steps:
       - name: Exit with error if some jobs are not successful

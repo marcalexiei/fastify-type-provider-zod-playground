@@ -1,25 +1,8 @@
 exports[`field > should NOT accept fields within limit 1`] = `
 {
-  "error": "Response Validation Error",
-  "message": "Request doesn't match the schema",
-  "statusCode": 415,
-  "details": {
-    "issues": [
-      {
-        "keyword": "too_big",
-        "instancePath": "/html",
-        "schemaPath": "#/html/too_big",
-        "message": "Too big: expected string to have <=10240 characters",
-        "params": {
-          "origin": "string",
-          "maximum": 10240,
-          "inclusive": true
-        }
-      }
-    ],
-    "method": "POST",
-    "url": "/testing-multi-part"
-  }
+  "statusCode": 413,
+  "code": "FST_REQ_FIELD_TOO_LARGE",
+  "message": "Field \\"html\\" exceeds 10240 bytes"
 }
 `;
 
