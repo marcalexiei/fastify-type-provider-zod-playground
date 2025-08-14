@@ -1,10 +1,23 @@
-import { describe, it } from "node:test";
+import { after, before, describe, it } from "node:test";
 import assert from "node:assert/strict";
+import { createApp } from "../src/app.ts";
+import type { FastifyInstance } from "fastify";
 
-const SERVER_URL = "http://localhost:5173/testing-multi-part";
+const port = 5173;
+let app: FastifyInstance;
+
+before(async () => {
+  app = await createApp();
+  await app.ready();
+  await app.listen({ port });
+});
+
+after(() => app.close());
+
+const SERVER_URL = `http://localhost:${port}/testing-multi-part`;
 
 describe("file", () => {
-  it("Upload within limits should pass", async (t) => {
+  it("should accept files within limit", async (t) => {
     const form = new FormData();
     form.append("html", new Blob(["ciao"]));
 
@@ -12,10 +25,10 @@ describe("file", () => {
     const json = await res.json();
 
     assert.equal(res.status, 200);
-    assert.equal(json.status, "ok");
+    t.assert.snapshot(json);
   });
 
-  it("should error with file exceeding size", async (t) => {
+  it("should NOT accept files within limit", async (t) => {
     const form = new FormData();
     form.append("html", new Blob(["x".repeat(100_000)]));
 
@@ -23,13 +36,12 @@ describe("file", () => {
     const json = await res.json();
 
     assert.equal(res.status, 413);
-    assert.equal(json.code, "FST_REQ_FILE_TOO_LARGE");
-    assert.equal(json.message, "request file too large");
+    t.assert.snapshot(json);
   });
 });
 
 describe("field", () => {
-  it("should display field", async (t) => {
+  it("should accept fields within limit", async (t) => {
     const form = new FormData();
     const html = "ciao";
     form.append("html", html);
@@ -38,10 +50,10 @@ describe("field", () => {
     const json = await res.json();
 
     assert.equal(res.status, 200);
-    t.assert.snapshot(json.body);
+    t.assert.snapshot(json);
   });
 
-  it("should error when a field exceeds size limit", async (t) => {
+  it("should NOT accept fields within limit", async (t) => {
     const form = new FormData();
     const html = "x".repeat(100_000);
     form.append("html", html);

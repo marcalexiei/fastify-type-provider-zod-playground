@@ -1,13 +1,4 @@
-exports[`field > should display field 1`] = `
-{
-  "html": "ciao",
-  "anotherField": {
-    "mood": []
-  }
-}
-`;
-
-exports[`field > should error when a field exceeds size limit 1`] = `
+exports[`field > should NOT accept fields within limit 1`] = `
 {
   "error": "Response Validation Error",
   "message": "Request doesn't match the schema",
@@ -28,6 +19,39 @@ exports[`field > should error when a field exceeds size limit 1`] = `
     ],
     "method": "POST",
     "url": "/testing-multi-part"
+  }
+}
+`;
+
+exports[`field > should accept fields within limit 1`] = `
+{
+  "status": "ok",
+  "body": {
+    "html": "ciao",
+    "anotherField": {
+      "mood": []
+    }
+  }
+}
+`;
+
+exports[`file > should NOT accept files within limit 1`] = `
+{
+  "statusCode": 413,
+  "code": "FST_REQ_FILE_TOO_LARGE",
+  "error": "Payload Too Large",
+  "message": "request file too large"
+}
+`;
+
+exports[`file > should accept files within limit 1`] = `
+{
+  "status": "ok",
+  "body": {
+    "html": "ciao",
+    "anotherField": {
+      "mood": []
+    }
   }
 }
 `;
