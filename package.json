@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "format": "biome format .",
+    "format:fix": "biome format . --write",
     "lint": "pnpm -r run lint",
     "typecheck": "pnpm -r run typecheck",
     "test": "pnpm -r run test"
