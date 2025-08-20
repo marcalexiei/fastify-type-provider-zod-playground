@@ -19,7 +19,7 @@ const SERVER_URL = `http://localhost:${port}/testing-multi-part`;
 describe('file', () => {
   it('should accept files within limit', async (t) => {
     const form = new FormData();
-    form.append('html', new Blob(['ciao']));
+    form.append('stringField', new Blob(['ciao']));
 
     const res = await fetch(SERVER_URL, { method: 'POST', body: form });
     const json = await res.json();
@@ -30,7 +30,7 @@ describe('file', () => {
 
   it('should NOT accept files within limit', async (t) => {
     const form = new FormData();
-    form.append('html', new Blob(['x'.repeat(100_000)]));
+    form.append('stringField', new Blob(['x'.repeat(100_000)]));
 
     const res = await fetch(SERVER_URL, { method: 'POST', body: form });
     const json = await res.json();
@@ -44,7 +44,7 @@ describe('field', () => {
   it('should accept fields within limit', async (t) => {
     const form = new FormData();
     const html = 'ciao';
-    form.append('html', html);
+    form.append('stringField', html);
 
     const res = await fetch(SERVER_URL, { method: 'POST', body: form });
     const json = await res.json();
@@ -56,7 +56,7 @@ describe('field', () => {
   it('should NOT accept fields within limit', async (t) => {
     const form = new FormData();
     const html = 'x'.repeat(100_000);
-    form.append('html', html);
+    form.append('stringField', html);
 
     const res = await fetch(SERVER_URL, { method: 'POST', body: form });
     const json = await res.json();

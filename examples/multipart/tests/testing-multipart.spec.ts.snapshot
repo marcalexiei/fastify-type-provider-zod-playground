@@ -2,7 +2,7 @@ exports[`field > should NOT accept fields within limit 1`] = `
 {
   "statusCode": 413,
   "code": "FST_REQ_FIELD_TOO_LARGE",
-  "message": "Field \\"html\\" exceeds 10240 bytes"
+  "message": "Field \\"stringField\\" exceeds 10240 bytes"
 }
 `;
 
@@ -10,8 +10,8 @@ exports[`field > should accept fields within limit 1`] = `
 {
   "status": "ok",
   "body": {
-    "html": "ciao",
-    "anotherField": {
+    "stringField": "ciao",
+    "jsonField": {
       "mood": []
     }
   }
@@ -31,8 +31,8 @@ exports[`file > should accept files within limit 1`] = `
 {
   "status": "ok",
   "body": {
-    "html": "ciao",
-    "anotherField": {
+    "stringField": "ciao",
+    "jsonField": {
       "mood": []
     }
   }

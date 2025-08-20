@@ -1,10 +1,8 @@
-import fastifyMultipart, {
-  type Multipart,
-  type MultipartValue,
-} from '@fastify/multipart';
+import fastify from 'fastify';
+import fastifyMultipart from '@fastify/multipart';
+import type { Multipart, MultipartValue } from '@fastify/multipart';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUI from '@fastify/swagger-ui';
-import type { ZodTypeProvider } from '@marcalexiei/fastify-type-provider-zod';
 import {
   hasZodFastifySchemaValidationErrors,
   isResponseSerializationError,
@@ -12,14 +10,15 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from '@marcalexiei/fastify-type-provider-zod';
-import fastify from 'fastify';
-import { SwaggerTheme, SwaggerThemeNameEnum } from 'swagger-themes';
+import type { ZodTypeProvider } from '@marcalexiei/fastify-type-provider-zod';
 import { z } from 'zod';
+import { SwaggerTheme, SwaggerThemeNameEnum } from 'swagger-themes';
 
 export const MULTIPART_MAX_SIZE = 10 * 1024;
 
 export async function createApp() {
-  const app = fastify();
+  const app = fastify().withTypeProvider<ZodTypeProvider>();
+
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
 
@@ -54,8 +53,9 @@ export async function createApp() {
     return reply.code(500).send(err);
   });
 
-  app.register(fastifySwagger, {
+  await app.register(fastifySwagger, {
     openapi: {
+      openapi: '3.1.0',
       info: {
         title: 'SampleApi',
         description: 'Sample backend service',
@@ -67,12 +67,16 @@ export async function createApp() {
   });
 
   const theme = new SwaggerTheme();
-  const themeContent = theme.getBuffer(SwaggerThemeNameEnum.DARK);
 
-  app.register(fastifySwaggerUI, {
+  await app.register(fastifySwaggerUI, {
     routePrefix: '/documentation',
     theme: {
-      css: [{ filename: 'theme.css', content: themeContent }],
+      css: [
+        {
+          filename: 'theme.css',
+          content: theme.getBuffer(SwaggerThemeNameEnum.DARK),
+        },
+      ],
     },
   });
 
@@ -83,20 +87,19 @@ export async function createApp() {
       fileSize: MULTIPART_MAX_SIZE,
     },
     async onFile(part) {
-      (part as unknown as MultipartValue).value = (
-        await part.toBuffer()
-      ).toString();
+      const buffer = await part.toBuffer();
+      (part as unknown as MultipartValue).value = buffer.toString();
     },
   });
 
   app.addHook('onRequest', (req, res, done) => {
+    req.isMultipart();
     if (!req.headers['content-type']?.trim().startsWith('multipart/')) {
       done();
       return;
     }
 
     const originalParts = req.parts.bind(req);
-
     // Override per-request parts() with a guarded iterator
     req.parts = function parts(opts): AsyncGenerator<Multipart> {
       const it = originalParts({
@@ -142,44 +145,37 @@ export async function createApp() {
     done();
   });
 
-  app.after(() => {
-    app.withTypeProvider<ZodTypeProvider>().route({
-      method: 'POST',
-      url: '/testing-multi-part',
-      schema: {
-        consumes: ['multipart/form-data'],
-        body: z.object({
-          html: z.preprocess(
-            (input: MultipartValue) => input.value,
-            z.string().max(MULTIPART_MAX_SIZE).describe('html'),
-          ),
-          anotherField: z.preprocess(
-            (input: MultipartValue<string>) => {
-              try {
-                if (input === undefined) {
-                  return;
-                }
-                if (typeof input.value === 'object') {
-                  return input;
-                }
-                return JSON.parse(input.value);
-              } catch {
-                return input.value;
-              }
-            },
-            z
-              .object({ mood: z.array(z.string()) }, { error: 'parsing error' })
-              .optional()
-              .describe('Options')
-              .default({ mood: [] }),
-          ),
-          /* another fields here */
-        }),
-      },
-      handler: (req, res) => {
-        res.send({ status: 'ok', body: req.body });
-      },
-    });
+  app.route({
+    method: 'POST',
+    url: '/testing-multi-part',
+    schema: {
+      consumes: ['multipart/form-data'],
+      body: z.object({
+        stringField: z.preprocess(
+          (input: MultipartValue) => input.value,
+          z.string().max(MULTIPART_MAX_SIZE).describe('html'),
+        ),
+        jsonField: z.preprocess(
+          // Unwrap input coming from multipart plugin so it can be validated from zod
+          (input: MultipartValue) => {
+            try {
+              // Consider using a safer alternative
+              return JSON.parse(input?.value as string);
+            } catch {
+              return;
+            }
+          },
+          z
+            .object({ mood: z.array(z.string()) }, { error: 'parsing error' })
+            .optional()
+            .describe('Options')
+            .default({ mood: [] }),
+        ),
+      }),
+    },
+    handler: (req, res) => {
+      res.send({ status: 'ok', body: req.body });
+    },
   });
 
   return app;
