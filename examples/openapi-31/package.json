@@ -1,0 +1,27 @@
+{
+  "name": "openapi-31",
+  "version": "1.0.0",
+  "private": true,
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.ts",
+    "dev": "node --watch src/index.ts",
+    "test": "node --test \"**/*.spec.ts\"",
+    "test:update": "node  --test --test-update-snapshots \"**/*.spec.ts\"",
+    "lint": "biome lint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fastify/multipart": "9.0.3",
+    "@fastify/swagger": "9.5.1",
+    "@fastify/swagger-ui": "5.2.3",
+    "@marcalexiei/fastify-type-provider-zod": "1.2.0",
+    "fastify": "5.5.0",
+    "swagger-themes": "1.4.3",
+    "zod": "4.0.17"
+  },
+  "devDependencies": {
+    "@types/node": "24.2.1"
+  }
+}
