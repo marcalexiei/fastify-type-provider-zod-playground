@@ -10,14 +10,12 @@ exports[`openAPI 3.1 description and examples > provide correct openAPI 3.1 spec
       "UserIdInput": {
         "description": "User identifier",
         "example": "U234",
-        "id": "UserId",
         "default": "J1",
         "type": "string"
       },
       "UserId": {
         "description": "User identifier",
         "example": "U234",
-        "id": "UserId",
         "default": "J1",
         "type": "string"
       },
@@ -26,7 +24,6 @@ exports[`openAPI 3.1 description and examples > provide correct openAPI 3.1 spec
         "example": {
           "name": "Someone"
         },
-        "id": "User",
         "type": "object",
         "properties": {
           "name": {
