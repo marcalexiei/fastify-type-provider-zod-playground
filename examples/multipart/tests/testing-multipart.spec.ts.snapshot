@@ -1,3 +1,44 @@
+exports[`body > should NOT accept fields within limit 1`] = `
+{
+  "error": "Response Validation Error",
+  "message": "Request doesn't match the schema",
+  "statusCode": 400,
+  "details": {
+    "issues": [
+      {
+        "keyword": "too_big",
+        "instancePath": "/stringField",
+        "schemaPath": "#/stringField/too_big",
+        "message": "Too big: expected string to have <=10240 characters",
+        "params": {
+          "origin": "string",
+          "maximum": 10240,
+          "inclusive": true
+        }
+      }
+    ],
+    "method": "POST",
+    "url": "/testing-multi-part"
+  }
+}
+`;
+
+exports[`body > should accept body within limit 1`] = `
+{
+  "status": "ok",
+  "bodyKeysType": {
+    "stringField": "string",
+    "jsonField": "object"
+  },
+  "body": {
+    "stringField": "ciao",
+    "jsonField": {
+      "mood": []
+    }
+  }
+}
+`;
+
 exports[`field > should NOT accept fields within limit 1`] = `
 {
   "statusCode": 413,
@@ -9,6 +50,10 @@ exports[`field > should NOT accept fields within limit 1`] = `
 exports[`field > should accept fields within limit 1`] = `
 {
   "status": "ok",
+  "bodyKeysType": {
+    "stringField": "string",
+    "jsonField": "object"
+  },
   "body": {
     "stringField": "ciao",
     "jsonField": {
@@ -30,6 +75,10 @@ exports[`file > should NOT accept files within limit 1`] = `
 exports[`file > should accept files within limit 1`] = `
 {
   "status": "ok",
+  "bodyKeysType": {
+    "stringField": "string",
+    "jsonField": "object"
+  },
   "body": {
     "stringField": "ciao",
     "jsonField": {

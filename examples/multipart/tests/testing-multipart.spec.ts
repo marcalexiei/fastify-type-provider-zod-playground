@@ -65,3 +65,41 @@ describe('field', () => {
     t.assert.snapshot(json);
   });
 });
+
+describe('body', () => {
+  it('should accept body within limit', async (t) => {
+    const html = 'ciao';
+    const form = { stringField: html };
+
+    const res = await fetch(SERVER_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify(form),
+    });
+    const json = await res.json();
+
+    assert.equal(res.status, 200);
+    t.assert.snapshot(json);
+  });
+
+  it('should NOT accept fields within limit', async (t) => {
+    const html = 'x'.repeat(100_000);
+    const form = { stringField: html };
+
+    const res = await fetch(SERVER_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify(form),
+    });
+    const json = await res.json();
+
+    assert.equal(res.status, 400);
+    t.assert.snapshot(json);
+  });
+});

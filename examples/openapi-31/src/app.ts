@@ -1,12 +1,12 @@
 import Fastify from 'fastify';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUI from '@fastify/swagger-ui';
+import type { ZodTypeProvider } from '@marcalexiei/fastify-type-provider-zod';
 import {
   jsonSchemaTransform,
   jsonSchemaTransformObject,
   validatorCompiler,
   serializerCompiler,
-  type ZodTypeProvider,
 } from '@marcalexiei/fastify-type-provider-zod';
 import z from 'zod';
 

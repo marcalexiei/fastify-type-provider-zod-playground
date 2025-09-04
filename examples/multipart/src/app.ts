@@ -1,8 +1,8 @@
-import fastify from 'fastify';
-import fastifyMultipart from '@fastify/multipart';
 import type { Multipart, MultipartValue } from '@fastify/multipart';
+import fastifyMultipart from '@fastify/multipart';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUI from '@fastify/swagger-ui';
+import type { ZodTypeProvider } from '@marcalexiei/fastify-type-provider-zod';
 import {
   hasZodFastifySchemaValidationErrors,
   isResponseSerializationError,
@@ -10,9 +10,9 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from '@marcalexiei/fastify-type-provider-zod';
-import type { ZodTypeProvider } from '@marcalexiei/fastify-type-provider-zod';
-import { z } from 'zod';
+import fastify from 'fastify';
 import { SwaggerTheme, SwaggerThemeNameEnum } from 'swagger-themes';
+import { z } from 'zod';
 
 export const MULTIPART_MAX_SIZE = 10 * 1024;
 
@@ -81,7 +81,7 @@ export async function createApp() {
   });
 
   await app.register(fastifyMultipart, {
-    attachFieldsToBody: true,
+    attachFieldsToBody: 'keyValues',
     limits: {
       fieldSize: MULTIPART_MAX_SIZE,
       fileSize: MULTIPART_MAX_SIZE,
@@ -93,7 +93,6 @@ export async function createApp() {
   });
 
   app.addHook('onRequest', (req, res, done) => {
-    req.isMultipart();
     if (!req.headers['content-type']?.trim().startsWith('multipart/')) {
       done();
       return;
@@ -145,28 +144,36 @@ export async function createApp() {
     done();
   });
 
+  app.addHook('preValidation', (req, _, done) => {
+    console.info({ place: 'preValidation', body: req.body });
+    done();
+  });
+
   app.route({
     method: 'POST',
     url: '/testing-multi-part',
     schema: {
       consumes: ['multipart/form-data'],
       body: z.object({
-        stringField: z.preprocess(
-          (input: MultipartValue) => input.value,
-          z.string().max(MULTIPART_MAX_SIZE).describe('html'),
-        ),
+        stringField: z.preprocess((input) => {
+          console.info('schema stringField', input);
+          return input;
+        }, z.string().max(MULTIPART_MAX_SIZE).describe('html')),
         jsonField: z.preprocess(
-          // Unwrap input coming from multipart plugin so it can be validated from zod
-          (input: MultipartValue) => {
+          (input) => {
+            console.info('schema jsonField', input);
             try {
               // Consider using a safer alternative
-              return JSON.parse(input?.value as string);
+              if (typeof input === 'string') {
+                return JSON.parse(input);
+              }
+              return input;
             } catch {
-              return;
+              return input;
             }
           },
           z
-            .object({ mood: z.array(z.string()) }, { error: 'parsing error' })
+            .strictObject({ mood: z.array(z.string()) })
             .optional()
             .describe('Options')
             .default({ mood: [] }),
@@ -174,7 +181,16 @@ export async function createApp() {
       }),
     },
     handler: (req, res) => {
-      res.send({ status: 'ok', body: req.body });
+      const bodyKeysType: Partial<Record<string, string>> = {};
+      for (const [name, value] of Object.entries(req.body)) {
+        bodyKeysType[name] = typeof value;
+      }
+
+      res.send({
+        status: 'ok',
+        bodyKeysType,
+        body: req.body,
+      });
     },
   });
 
