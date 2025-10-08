@@ -1,7 +1,6 @@
 import type { Multipart, MultipartValue } from '@fastify/multipart';
 import fastifyMultipart from '@fastify/multipart';
 import fastifySwagger from '@fastify/swagger';
-import fastifySwaggerUI from '@fastify/swagger-ui';
 import type { ZodTypeProvider } from '@marcalexiei/fastify-type-provider-zod';
 import {
   hasZodFastifySchemaValidationErrors,
@@ -10,8 +9,8 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from '@marcalexiei/fastify-type-provider-zod';
+import scalarUI from '@scalar/fastify-api-reference';
 import fastify from 'fastify';
-import { SwaggerTheme, SwaggerThemeNameEnum } from 'swagger-themes';
 import { z } from 'zod';
 
 export const MULTIPART_MAX_SIZE = 10 * 1024;
@@ -61,22 +60,37 @@ export async function createApp() {
         description: 'Sample backend service',
         version: '1.0.0',
       },
-      servers: [],
+      components: {
+        securitySchemes: {
+          timestamp: {
+            type: 'apiKey',
+            description:
+              '⚠️ Seconds, not milliseconds. ⚠️<br>Only in documentation: generated automatically, when not provided.',
+            in: 'header',
+            name: 'timestamp',
+          },
+          signatureData: {
+            type: 'apiKey',
+            in: 'header',
+            name: 'SignatureData',
+          },
+        },
+      },
+      security: [{ timestamp: [], signatureData: [] }],
     },
     transform: jsonSchemaTransform,
   });
 
-  const theme = new SwaggerTheme();
-
-  await app.register(fastifySwaggerUI, {
-    routePrefix: '/documentation',
-    theme: {
-      css: [
-        {
-          filename: 'theme.css',
-          content: theme.getBuffer(SwaggerThemeNameEnum.DARK),
-        },
-      ],
+  await app.register(scalarUI, {
+    routePrefix: '/docs',
+    configuration: {
+      onBeforeRequest: async ({ request }) => {
+        await Promise.resolve(1);
+        console.info(request.headers.get('signaturedata'));
+        // request.headers.delete('signaturedata')
+        request.headers.append('foo', 'bar');
+        console.info(Array.from(request.headers.entries()));
+      },
     },
   });
 
