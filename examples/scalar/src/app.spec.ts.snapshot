@@ -1,0 +1,104 @@
+exports[`openAPI 3.1 description and examples > provide correct openAPI 3.1 spec file 1`] = `
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "SampleApi",
+    "version": "1.0.1"
+  },
+  "components": {
+    "schemas": {
+      "UserIdInput": {
+        "description": "User identifier",
+        "example": "U234",
+        "default": "J1",
+        "type": "string"
+      },
+      "UserId": {
+        "description": "User identifier",
+        "example": "U234",
+        "default": "J1",
+        "type": "string"
+      },
+      "User": {
+        "description": "User Data",
+        "example": {
+          "name": "Someone"
+        },
+        "type": "object",
+        "properties": {
+          "name": {
+            "default": "Unknown",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "paths": {
+    "/login": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "$ref": "#/components/schemas/UserIdInput"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "example": "wiiiiiiiiii",
+              "type": "string"
+            },
+            "in": "query",
+            "name": "baz",
+            "required": true,
+            "description": "query string example"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "baz": {
+                      "type": "string"
+                    },
+                    "userId": {
+                      "$ref": "#/components/schemas/UserId"
+                    },
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  },
+                  "required": [
+                    "baz",
+                    "userId",
+                    "user"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "servers": []
+}
+`;
