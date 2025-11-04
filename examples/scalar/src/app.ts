@@ -11,7 +11,7 @@ import Fastify from 'fastify';
 import z from 'zod';
 
 export async function createApp() {
-  const app = Fastify();
+  const app = Fastify().withTypeProvider<ZodTypeProvider>();
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
 
@@ -44,9 +44,12 @@ export async function createApp() {
 
   await app.register(scalarUI, {
     routePrefix: '/docs',
+    configuration: {
+      showToolbar: 'never',
+    },
   });
 
-  app.withTypeProvider<ZodTypeProvider>().route({
+  app.route({
     method: 'POST',
     url: '/login',
     schema: {
@@ -69,6 +72,21 @@ export async function createApp() {
     },
     handler: (req, res) => {
       res.send({ baz: 'asd', userId: req.body.userId, user: {} });
+    },
+  });
+
+  app.route({
+    method: 'POST',
+    url: '/another',
+    schema: {
+      consumes: ['text/html', 'text/plain'],
+      body: z.string(),
+      response: {
+        200: z.object({ status: z.literal('ok'), body: z.unknown() }),
+      },
+    },
+    handler: (req, res) => {
+      res.send({ status: 'ok', body: req.body });
     },
   });
 
