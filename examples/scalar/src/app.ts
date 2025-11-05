@@ -46,6 +46,33 @@ export async function createApp() {
     routePrefix: '/docs',
     configuration: {
       showToolbar: 'never',
+      defaultHttpClient: {
+        clientKey: 'fetch',
+        targetKey: 'node',
+      },
+      hiddenClients: {
+        c: true,
+        r: true,
+        go: true,
+        rust: true,
+        clojure: true,
+        csharp: true,
+        dart: true,
+        http: true,
+        fsharp: true,
+        java: ['unirest', 'asynchttp', 'okhttp'],
+        js: true,
+        kotlin: true,
+        node: ['ofetch', 'undici'],
+        objc: true,
+        ocaml: true,
+        php: true,
+        powershell: true,
+        python: true,
+        ruby: true,
+        shell: ['httpie'],
+        swift: true,
+      },
     },
   });
 
