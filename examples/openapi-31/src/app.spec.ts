@@ -1,5 +1,7 @@
-import type { FastifyInstance } from 'fastify';
 import { before, describe, it } from 'node:test';
+
+import type { FastifyInstance } from 'fastify';
+
 import { createApp } from './app.ts';
 
 describe('openAPI 3.1 description and examples', () => {

@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { after, before, describe, it } from 'node:test';
+
 import type { FastifyInstance } from 'fastify';
+
 import { createApp } from '../src/app.ts';
 
 const port = 5173;

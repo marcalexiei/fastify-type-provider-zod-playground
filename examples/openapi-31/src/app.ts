@@ -1,13 +1,13 @@
-import Fastify from 'fastify';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUI from '@fastify/swagger-ui';
 import type { ZodTypeProvider } from '@marcalexiei/fastify-type-provider-zod';
 import {
   jsonSchemaTransform,
   jsonSchemaTransformObject,
-  validatorCompiler,
   serializerCompiler,
+  validatorCompiler,
 } from '@marcalexiei/fastify-type-provider-zod';
+import Fastify from 'fastify';
 import z from 'zod';
 
 export async function createApp() {
