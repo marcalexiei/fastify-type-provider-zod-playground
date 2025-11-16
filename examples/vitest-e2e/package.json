@@ -1,5 +1,5 @@
 {
-  "name": "scalar",
+  "name": "vitest-e2e",
   "version": "1.0.0",
   "private": true,
   "description": "",
@@ -7,13 +7,12 @@
   "scripts": {
     "start": "node src/index.ts",
     "dev": "node --watch src/index.ts",
-    "test": "node --test \"**/*.spec.ts\"",
-    "test:update": "node  --test --test-update-snapshots \"**/*.spec.ts\"",
+    "test": "vitest",
+    "test:update": "vitest -u",
     "lint": "biome lint .",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@fastify/multipart": "9.0.3",
     "@fastify/swagger": "9.5.1",
     "@marcalexiei/fastify-type-provider-zod": "catalog:default",
     "@scalar/fastify-api-reference": "1.39.0",
@@ -22,6 +21,7 @@
     "zod": "catalog:default"
   },
   "devDependencies": {
-    "@types/node": "catalog:default"
+    "@types/node": "catalog:default",
+    "vitest": "4.0.9"
   }
 }

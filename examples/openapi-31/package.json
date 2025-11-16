@@ -16,12 +16,12 @@
     "@fastify/multipart": "9.0.3",
     "@fastify/swagger": "9.5.1",
     "@fastify/swagger-ui": "5.2.3",
-    "@marcalexiei/fastify-type-provider-zod": "2.0.0",
-    "fastify": "5.5.0",
+    "@marcalexiei/fastify-type-provider-zod": "catalog:default",
+    "fastify": "catalog:default",
     "swagger-themes": "1.4.3",
-    "zod": "4.1.5"
+    "zod": "catalog:default"
   },
   "devDependencies": {
-    "@types/node": "24.3.0"
+    "@types/node": "catalog:default"
   }
 }
