@@ -6,8 +6,7 @@ on:
       - main
   pull_request:
 
-permissions:
-  contents: read
+permissions: {}
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
@@ -32,12 +31,58 @@ jobs:
       - name: Lint
         run: pnpm run lint
 
+  get-examples:
+    name: Get examples
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+
+    permissions:
+      contents: read
+
+    outputs:
+      names: ${{ steps.find.outputs.names }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - id: find
+        working-directory: examples
+        # produces the list of folder inside examples without leading `./` and trailing `/`:
+        # ```text
+        # vitest-e2e
+        # openapi-31
+        # multipart
+        # scalar
+        # ```
+        #
+        # after, using `jq` the output is converted into a JSON array:
+        # ```json
+        # ["vitest-e2e","openapi-31","multipart","scalar"]
+        # ```
+        #
+        # and added to `$GITHUB_OUTPUT` env variable:
+        run: |
+          NAMES=$(find . -mindepth 1 -maxdepth 1 -type d -exec basename {} \;)
+          echo "$NAMES" | jq -R -s -c 'split("\n")[:-1]'
+          echo "names=$(echo "$NAMES" | jq -R -s -c 'split("\n")[:-1]')" >> "$GITHUB_OUTPUT"
+
   test:
-    name: Test Node ${{ matrix.node-version }} on ${{ matrix.os }}
+    name: Test ${{ matrix.example-name }} Example (Node ${{ matrix.node-version }} / ${{ matrix.os }})
+
+    permissions:
+      contents: read
+
     timeout-minutes: 5
+
     runs-on: ${{ matrix.os }}
+
+    needs:
+      - get-examples
+
     strategy:
       matrix:
+        example-name: ${{ fromJson(needs.get-examples.outputs.names) }}
         node-version:
           - 24
         os:
