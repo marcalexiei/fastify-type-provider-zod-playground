@@ -68,7 +68,7 @@ jobs:
           echo "names=$(echo "$NAMES" | jq -R -s -c 'split("\n")[:-1]')" >> "$GITHUB_OUTPUT"
 
   test:
-    name: Test ${{ matrix.example-name }} Example (Node ${{ matrix.node-version }} / ${{ matrix.os }})
+    name: Test "${{ matrix.example-name }}" (Node ${{ matrix.node-version }} / ${{ matrix.os }})
 
     permissions:
       contents: read
@@ -102,7 +102,7 @@ jobs:
       #   run: pnpm run build
 
       - name: Run tests
-        run: pnpm run test
+        run: pnpm --filter=${{ matrix.example-name }} run test
 
   ci-ok:
     name: CI OK
