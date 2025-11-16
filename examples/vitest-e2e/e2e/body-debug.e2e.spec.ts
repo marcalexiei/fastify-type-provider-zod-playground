@@ -1,10 +1,10 @@
 import { describe, expect, inject, it } from 'vitest';
 
-describe('openAPI 3.1 description and examples', () => {
+describe('/body-debug', () => {
   const appBaseURL = inject('appBaseURL');
 
-  it('provide correct openAPI 3.1 spec file', async () => {
-    const req = fetch(`${appBaseURL}/test`, {
+  it('works', async () => {
+    const req = fetch(`${appBaseURL}/body-debug`, {
       method: 'POST',
       body: 'test2',
     });

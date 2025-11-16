@@ -36,35 +36,25 @@ export async function createApp() {
         clientKey: 'fetch',
         targetKey: 'node',
       },
-      hiddenClients: {
-        c: true,
-        r: true,
-        go: true,
-        rust: true,
-        clojure: true,
-        csharp: true,
-        dart: true,
-        http: true,
-        fsharp: true,
-        java: ['unirest', 'asynchttp', 'okhttp'],
-        js: true,
-        kotlin: true,
-        node: ['ofetch', 'undici'],
-        objc: true,
-        ocaml: true,
-        php: true,
-        powershell: true,
-        python: true,
-        ruby: true,
-        shell: ['httpie'],
-        swift: true,
+    },
+  });
+
+  app.route({
+    method: 'GET',
+    url: '/random',
+    schema: {
+      response: {
+        200: z.object({ number: z.number() }),
       },
+    },
+    handler: (_, res) => {
+      res.send({ number: Math.random() });
     },
   });
 
   app.route({
     method: 'POST',
-    url: '/test',
+    url: '/body-debug',
     schema: {
       consumes: ['text/html', 'text/plain'],
       body: z.string(),
