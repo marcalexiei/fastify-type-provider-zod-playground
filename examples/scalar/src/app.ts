@@ -104,7 +104,22 @@ export async function createApp() {
 
   app.route({
     method: 'POST',
-    url: '/another',
+    url: '/without-trailing-slash',
+    schema: {
+      consumes: ['text/html', 'text/plain'],
+      body: z.string(),
+      response: {
+        200: z.object({ status: z.literal('ok'), body: z.unknown() }),
+      },
+    },
+    handler: (req, res) => {
+      res.send({ status: 'ok', body: req.body });
+    },
+  });
+
+  app.route({
+    method: 'POST',
+    url: '/with-trailing-slash/',
     schema: {
       consumes: ['text/html', 'text/plain'],
       body: z.string(),

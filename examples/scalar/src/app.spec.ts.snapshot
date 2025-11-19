@@ -98,7 +98,51 @@ exports[`openAPI 3.1 description and examples > provide correct openAPI 3.1 spec
         }
       }
     },
-    "/another": {
+    "/without-trailing-slash": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "text/html": {
+              "schema": {
+                "type": "string"
+              }
+            },
+            "text/plain": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "ok"
+                      ]
+                    },
+                    "body": {}
+                  },
+                  "required": [
+                    "status",
+                    "body"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/with-trailing-slash/": {
       "post": {
         "requestBody": {
           "content": {
