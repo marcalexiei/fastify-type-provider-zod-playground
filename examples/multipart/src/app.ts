@@ -9,7 +9,7 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from '@marcalexiei/fastify-type-provider-zod';
-import scalarUI from '@scalar/fastify-api-reference';
+import scalarAPIReference from '@scalar/fastify-api-reference';
 import fastify from 'fastify';
 import { z } from 'zod';
 
@@ -81,7 +81,7 @@ export async function createApp() {
     transform: jsonSchemaTransform,
   });
 
-  await app.register(scalarUI, {
+  await app.register(scalarAPIReference, {
     routePrefix: '/docs',
     configuration: {
       onBeforeRequest: async ({ request }) => {

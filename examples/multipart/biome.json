@@ -4,16 +4,6 @@
   "linter": {
     "domains": {
       "project": "all"
-    },
-    "rules": {
-      "suspicious": {
-        "noConsole": {
-          "level": "error",
-          "options": {
-            "allow": ["info"]
-          }
-        }
-      }
     }
   }
 }

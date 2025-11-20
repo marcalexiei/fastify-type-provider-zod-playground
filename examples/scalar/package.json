@@ -16,9 +16,8 @@
     "@fastify/multipart": "9.0.3",
     "@fastify/swagger": "9.5.1",
     "@marcalexiei/fastify-type-provider-zod": "catalog:default",
-    "@scalar/fastify-api-reference": "1.39.3",
+    "@scalar/fastify-api-reference": "catalog:default",
     "fastify": "catalog:default",
-    "swagger-themes": "1.4.3",
     "zod": "catalog:default"
   },
   "devDependencies": {

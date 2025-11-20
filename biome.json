@@ -1,4 +1,16 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-  "extends": ["@marcalexiei/biome-config/base"]
+  "extends": ["@marcalexiei/biome-config/base"],
+  "linter": {
+    "rules": {
+      "suspicious": {
+        "noConsole": {
+          "level": "error",
+          "options": {
+            "allow": ["info"]
+          }
+        }
+      }
+    }
+  }
 }

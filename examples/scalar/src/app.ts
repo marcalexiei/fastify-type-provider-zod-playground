@@ -6,7 +6,7 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from '@marcalexiei/fastify-type-provider-zod';
-import scalarUI from '@scalar/fastify-api-reference';
+import scalarAPIReference from '@scalar/fastify-api-reference';
 import Fastify from 'fastify';
 import z from 'zod';
 
@@ -42,10 +42,10 @@ export async function createApp() {
     transformObject: jsonSchemaTransformObject,
   });
 
-  await app.register(scalarUI, {
+  await app.register(scalarAPIReference, {
     routePrefix: '/docs',
     configuration: {
-      showToolbar: 'never',
+      showDeveloperTools: 'never',
       defaultHttpClient: {
         clientKey: 'fetch',
         targetKey: 'node',
