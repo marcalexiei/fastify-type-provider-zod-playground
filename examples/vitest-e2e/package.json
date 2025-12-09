@@ -13,7 +13,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@fastify/swagger": "9.5.1",
+    "@fastify/swagger": "9.6.1",
     "@marcalexiei/fastify-type-provider-zod": "catalog:default",
     "@scalar/fastify-api-reference": "catalog:default",
     "fastify": "catalog:default",
@@ -22,6 +22,6 @@
   },
   "devDependencies": {
     "@types/node": "catalog:default",
-    "vitest": "4.0.9"
+    "vitest": "4.0.15"
   }
 }

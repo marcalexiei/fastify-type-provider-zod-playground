@@ -9,4 +9,6 @@ async function run() {
   app.log.info(`Documentation running at ${address}`);
 }
 
-run().catch(() => {});
+run().catch((e) => {
+  throw e;
+});
