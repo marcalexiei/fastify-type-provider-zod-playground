@@ -3,11 +3,11 @@ import fastifyMultipart from '@fastify/multipart';
 import fastifySwagger from '@fastify/swagger';
 import type { ZodTypeProvider } from '@marcalexiei/fastify-type-provider-zod';
 import {
+  createJsonSchemaTransform,
+  createSerializerCompiler,
+  createValidatorCompiler,
   hasZodFastifySchemaValidationErrors,
   isResponseSerializationError,
-  jsonSchemaTransform,
-  serializerCompiler,
-  validatorCompiler,
 } from '@marcalexiei/fastify-type-provider-zod';
 import scalarAPIReference from '@scalar/fastify-api-reference';
 import fastify from 'fastify';
@@ -18,8 +18,8 @@ export const MULTIPART_MAX_SIZE = 10 * 1024;
 export async function createApp() {
   const app = fastify().withTypeProvider<ZodTypeProvider>();
 
-  app.setValidatorCompiler(validatorCompiler);
-  app.setSerializerCompiler(serializerCompiler);
+  app.setValidatorCompiler(createValidatorCompiler());
+  app.setSerializerCompiler(createSerializerCompiler());
 
   app.setErrorHandler((err, req, reply) => {
     if (hasZodFastifySchemaValidationErrors(err)) {
@@ -78,7 +78,7 @@ export async function createApp() {
       },
       security: [{ timestamp: [], signatureData: [] }],
     },
-    transform: jsonSchemaTransform,
+    transform: createJsonSchemaTransform(),
   });
 
   await app.register(scalarAPIReference, {

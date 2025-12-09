@@ -1,10 +1,10 @@
 import fastifySwagger from '@fastify/swagger';
 import type { ZodTypeProvider } from '@marcalexiei/fastify-type-provider-zod';
 import {
-  jsonSchemaTransform,
-  jsonSchemaTransformObject,
-  serializerCompiler,
-  validatorCompiler,
+  createJsonSchemaTransform,
+  createJsonSchemaTransformObject,
+  createSerializerCompiler,
+  createValidatorCompiler,
 } from '@marcalexiei/fastify-type-provider-zod';
 import scalarAPIReference from '@scalar/fastify-api-reference';
 import Fastify from 'fastify';
@@ -12,8 +12,8 @@ import z from 'zod';
 
 export async function createApp() {
   const app = Fastify().withTypeProvider<ZodTypeProvider>();
-  app.setValidatorCompiler(validatorCompiler);
-  app.setSerializerCompiler(serializerCompiler);
+  app.setValidatorCompiler(createValidatorCompiler());
+  app.setSerializerCompiler(createSerializerCompiler());
 
   await app.register(fastifySwagger, {
     openapi: {
@@ -24,8 +24,8 @@ export async function createApp() {
       },
       servers: [],
     },
-    transform: jsonSchemaTransform,
-    transformObject: jsonSchemaTransformObject,
+    transform: createJsonSchemaTransform(),
+    transformObject: createJsonSchemaTransformObject(),
   });
 
   app.register(scalarAPIReference, {
