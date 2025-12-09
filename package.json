@@ -8,7 +8,8 @@
     "format:fix": "biome format . --write",
     "lint": "pnpm -r run lint",
     "typecheck": "pnpm -r run typecheck",
-    "test": "pnpm -r run test"
+    "test": "pnpm -r run test",
+    "check-all": "pnpm run format && pnpm run lint && pnpm run typecheck && pnpm run test"
   },
   "keywords": [],
   "author": "",
