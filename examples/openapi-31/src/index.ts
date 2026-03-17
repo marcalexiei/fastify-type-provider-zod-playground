@@ -2,4 +2,4 @@ import { createApp } from './app.ts';
 
 const app = await createApp();
 
-app.listen({ port: 3000 });
+await app.listen({ port: 3000 });

@@ -11,11 +11,13 @@ import {
 } from '@marcalexiei/fastify-type-provider-zod';
 import scalarAPIReference from '@scalar/fastify-api-reference';
 import fastify from 'fastify';
+import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 
 export const MULTIPART_MAX_SIZE = 10 * 1024;
 
-export async function createApp() {
+// oxlint-disable-next-line max-lines-per-function
+export async function createApp(): Promise<FastifyInstance> {
   const app = fastify().withTypeProvider<ZodTypeProvider>();
 
   app.setValidatorCompiler(createValidatorCompiler());
@@ -24,27 +26,27 @@ export async function createApp() {
   app.setErrorHandler((err, req, reply) => {
     if (hasZodFastifySchemaValidationErrors(err)) {
       return reply.code(400).send({
-        error: 'Response Validation Error',
-        message: "Request doesn't match the schema",
-        statusCode: 400,
         details: {
           issues: err.validation,
           method: req.method,
           url: req.url,
         },
+        error: 'Response Validation Error',
+        message: "Request doesn't match the schema",
+        statusCode: 400,
       });
     }
 
     if (isResponseSerializationError(err)) {
       return reply.code(500).send({
-        error: 'Internal Server Error',
-        message: "Response doesn't match the schema",
-        statusCode: 500,
         details: {
           issues: err.cause.issues,
           method: err.method,
           url: err.url,
         },
+        error: 'Internal Server Error',
+        message: "Response doesn't match the schema",
+        statusCode: 500,
       });
     }
 
@@ -54,35 +56,34 @@ export async function createApp() {
 
   await app.register(fastifySwagger, {
     openapi: {
-      openapi: '3.1.0',
-      info: {
-        title: 'SampleApi',
-        description: 'Sample backend service',
-        version: '1.0.0',
-      },
       components: {
         securitySchemes: {
-          timestamp: {
+          signatureData: {
+            in: 'header',
+            name: 'SignatureData',
             type: 'apiKey',
+          },
+          timestamp: {
             description:
               '⚠️ Seconds, not milliseconds. ⚠️<br>Only in documentation: generated automatically, when not provided.',
             in: 'header',
             name: 'timestamp',
-          },
-          signatureData: {
             type: 'apiKey',
-            in: 'header',
-            name: 'SignatureData',
           },
         },
       },
-      security: [{ timestamp: [], signatureData: [] }],
+      info: {
+        description: 'Sample backend service',
+        title: 'SampleApi',
+        version: '1.0.0',
+      },
+      openapi: '3.1.0',
+      security: [{ signatureData: [], timestamp: [] }],
     },
     transform: createJsonSchemaTransform(),
   });
 
   await app.register(scalarAPIReference, {
-    routePrefix: '/docs',
     configuration: {
       onBeforeRequest: async ({ request }) => {
         await Promise.resolve(1);
@@ -92,6 +93,7 @@ export async function createApp() {
         console.info(Array.from(request.headers.entries()));
       },
     },
+    routePrefix: '/docs',
   });
 
   await app.register(fastifyMultipart, {
@@ -102,6 +104,7 @@ export async function createApp() {
     },
     async onFile(part) {
       const buffer = await part.toBuffer();
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion
       (part as unknown as MultipartValue).value = buffer.toString();
     },
   });
@@ -123,9 +126,7 @@ export async function createApp() {
         },
       });
 
-      async function processPartAndCheckIfIsTruncated(
-        part: Multipart,
-      ): Promise<boolean> {
+      async function processPartAndCheckIfIsTruncated(part: Multipart): Promise<boolean> {
         if (part.type !== 'field' || !part.valueTruncated) {
           return false;
         }
@@ -139,13 +140,14 @@ export async function createApp() {
         return true;
       }
 
+      // oxlint-disable-next-line typescript/consistent-return
       async function* guarded(): AsyncGenerator<Multipart> {
         for await (const part of it) {
           if (await processPartAndCheckIfIsTruncated(part)) {
             return res.status(413).send({
-              statusCode: 413,
               code: 'FST_REQ_FIELD_TOO_LARGE',
               message: `Field "${part.fieldname}" exceeds ${MULTIPART_MAX_SIZE} bytes`,
+              statusCode: 413,
             });
           }
           yield part;
@@ -158,28 +160,36 @@ export async function createApp() {
     done();
   });
 
-  app.addHook('preValidation', (req, _, done) => {
-    console.info({ place: 'preValidation', body: req.body });
+  app.addHook('preValidation', (req, _res, done) => {
+    console.info({ body: req.body, place: 'preValidation' });
     done();
   });
 
   app.route({
+    handler: (req, res) => {
+      const bodyKeysType: Partial<Record<string, string>> = {};
+      for (const [name, value] of Object.entries(req.body)) {
+        bodyKeysType[name] = typeof value;
+      }
+
+      res.send({
+        body: req.body,
+        bodyKeysType,
+        status: 'ok',
+      });
+    },
     method: 'POST',
-    url: '/testing-multi-part',
     schema: {
-      consumes: ['multipart/form-data'],
       body: z.object({
-        stringField: z.preprocess((input) => {
-          console.info('schema stringField', input);
-          return input;
-        }, z.string().max(MULTIPART_MAX_SIZE).describe('html')),
         jsonField: z.preprocess(
           (input) => {
+            // oxlint-disable-next-line no-console
             console.info('schema jsonField', input);
             try {
               // Consider using a safer alternative
               if (typeof input === 'string') {
-                return JSON.parse(input);
+                // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+                return JSON.parse(input) as Record<string, unknown>;
               }
               return input;
             } catch {
@@ -192,20 +202,15 @@ export async function createApp() {
             .describe('Options')
             .default({ mood: [] }),
         ),
+        stringField: z.preprocess((input) => {
+          // oxlint-disable-next-line no-console
+          console.info('schema stringField', input);
+          return input;
+        }, z.string().max(MULTIPART_MAX_SIZE).describe('html')),
       }),
+      consumes: ['multipart/form-data'],
     },
-    handler: (req, res) => {
-      const bodyKeysType: Partial<Record<string, string>> = {};
-      for (const [name, value] of Object.entries(req.body)) {
-        bodyKeysType[name] = typeof value;
-      }
-
-      res.send({
-        status: 'ok',
-        bodyKeysType,
-        body: req.body,
-      });
-    },
+    url: '/testing-multi-part',
   });
 
   return app;

@@ -8,9 +8,11 @@ import {
 } from '@marcalexiei/fastify-type-provider-zod';
 import scalarAPIReference from '@scalar/fastify-api-reference';
 import Fastify from 'fastify';
-import z from 'zod';
+import type { FastifyInstance } from 'fastify';
+import { z } from 'zod';
 
-export async function createApp() {
+// oxlint-disable-next-line max-lines-per-function
+export async function createApp(): Promise<FastifyInstance> {
   const app = Fastify().withTypeProvider<ZodTypeProvider>();
   app.setValidatorCompiler(createValidatorCompiler());
   app.setSerializerCompiler(createSerializerCompiler());
@@ -21,21 +23,19 @@ export async function createApp() {
     id: 'UserId',
   });
 
-  const UserSchema = z
-    .strictObject({ name: z.string().optional().default('Unknown') })
-    .meta({
-      description: 'User Data',
-      example: { name: 'Someone' },
-      id: 'User',
-    });
+  const UserSchema = z.strictObject({ name: z.string().optional().default('Unknown') }).meta({
+    description: 'User Data',
+    example: { name: 'Someone' },
+    id: 'User',
+  });
 
   await app.register(fastifySwagger, {
     openapi: {
-      openapi: '3.1.0',
       info: {
         title: 'SampleApi',
         version: '1.0.1',
       },
+      openapi: '3.1.0',
       servers: [],
     },
     transform: createJsonSchemaTransform(),
@@ -43,23 +43,20 @@ export async function createApp() {
   });
 
   await app.register(scalarAPIReference, {
-    routePrefix: '/docs',
     configuration: {
-      showDeveloperTools: 'never',
       defaultHttpClient: {
         clientKey: 'fetch',
         targetKey: 'node',
       },
       hiddenClients: {
+        /* oxlint-disable id-length */
         c: true,
-        r: true,
-        go: true,
-        rust: true,
         clojure: true,
         csharp: true,
         dart: true,
-        http: true,
         fsharp: true,
+        go: true,
+        http: true,
         java: ['unirest', 'asynchttp', 'okhttp'],
         js: true,
         kotlin: true,
@@ -69,67 +66,72 @@ export async function createApp() {
         php: true,
         powershell: true,
         python: true,
+        r: true,
         ruby: true,
+        rust: true,
         shell: ['httpie'],
         swift: true,
+        /* oxlint-enable id-length */
       },
+      showDeveloperTools: 'never',
     },
+    routePrefix: '/docs',
   });
 
   app.route({
+    handler: (req, res) => {
+      res.send({ baz: 'asd', user: {}, userId: req.body.userId });
+    },
     method: 'POST',
-    url: '/login',
     schema: {
+      body: z.object({
+        userId: UserIdSchema,
+      }),
       querystring: z.object({
         baz: z.string().meta({
           description: 'query string example',
           example: 'wiiiiiiiiii',
         }),
       }),
-      body: z.object({
-        userId: UserIdSchema,
-      }),
       response: {
         200: z.object({
           baz: z.string(),
-          userId: UserIdSchema,
           user: UserSchema,
+          userId: UserIdSchema,
         }),
       },
     },
-    handler: (req, res) => {
-      res.send({ baz: 'asd', userId: req.body.userId, user: {} });
-    },
+    url: '/login',
   });
 
   app.route({
+    handler: (req, res) => {
+      res.send({ body: req.body, status: 'ok' });
+    },
     method: 'POST',
+    schema: {
+      body: z.string(),
+      consumes: ['text/html', 'text/plain'],
+      response: {
+        200: z.object({ body: z.unknown(), status: z.literal('ok') }),
+      },
+    },
     url: '/without-trailing-slash',
-    schema: {
-      consumes: ['text/html', 'text/plain'],
-      body: z.string(),
-      response: {
-        200: z.object({ status: z.literal('ok'), body: z.unknown() }),
-      },
-    },
-    handler: (req, res) => {
-      res.send({ status: 'ok', body: req.body });
-    },
   });
 
   app.route({
+    handler: (req, res) => {
+      res.send({ body: req.body, status: 'ok' });
+    },
     method: 'POST',
-    url: '/with-trailing-slash/',
     schema: {
-      consumes: ['text/html', 'text/plain'],
       body: z.string(),
+      consumes: ['text/html', 'text/plain'],
       response: {
-        200: z.object({ status: z.literal('ok'), body: z.unknown() }),
+        200: z.object({ body: z.unknown(), status: z.literal('ok') }),
       },
     },
-    handler: (req, res) => {
-      res.send({ status: 'ok', body: req.body });
-    },
+    url: '/with-trailing-slash/',
   });
 
   await app.ready();

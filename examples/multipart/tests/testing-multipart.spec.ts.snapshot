@@ -1,8 +1,5 @@
 exports[`body > should NOT accept fields within limit 1`] = `
 {
-  "error": "Response Validation Error",
-  "message": "Request doesn't match the schema",
-  "statusCode": 400,
   "details": {
     "issues": [
       {
@@ -19,47 +16,50 @@ exports[`body > should NOT accept fields within limit 1`] = `
     ],
     "method": "POST",
     "url": "/testing-multi-part"
-  }
+  },
+  "error": "Response Validation Error",
+  "message": "Request doesn't match the schema",
+  "statusCode": 400
 }
 `;
 
 exports[`body > should accept body within limit 1`] = `
 {
-  "status": "ok",
-  "bodyKeysType": {
-    "stringField": "string",
-    "jsonField": "object"
-  },
   "body": {
-    "stringField": "ciao",
     "jsonField": {
       "mood": []
-    }
-  }
+    },
+    "stringField": "ciao"
+  },
+  "bodyKeysType": {
+    "jsonField": "object",
+    "stringField": "string"
+  },
+  "status": "ok"
 }
 `;
 
 exports[`field > should NOT accept fields within limit 1`] = `
 {
-  "statusCode": 413,
   "code": "FST_REQ_FIELD_TOO_LARGE",
-  "message": "Field \\"stringField\\" exceeds 10240 bytes"
+  "message": "Field \\"stringField\\" exceeds 10240 bytes",
+  "statusCode": 413
 }
 `;
 
 exports[`field > should accept fields within limit 1`] = `
 {
-  "status": "ok",
-  "bodyKeysType": {
-    "stringField": "string",
-    "jsonField": "object"
-  },
   "body": {
-    "stringField": "ciao",
     "jsonField": {
       "mood": []
-    }
-  }
+    },
+    "stringField": "ciao"
+  },
+  "bodyKeysType": {
+    "jsonField": "object",
+    "stringField": "string"
+  },
+  "status": "ok"
 }
 `;
 
@@ -74,16 +74,16 @@ exports[`file > should NOT accept files within limit 1`] = `
 
 exports[`file > should accept files within limit 1`] = `
 {
-  "status": "ok",
-  "bodyKeysType": {
-    "stringField": "string",
-    "jsonField": "object"
-  },
   "body": {
-    "stringField": "ciao",
     "jsonField": {
       "mood": []
-    }
-  }
+    },
+    "stringField": "ciao"
+  },
+  "bodyKeysType": {
+    "jsonField": "object",
+    "stringField": "string"
+  },
+  "status": "ok"
 }
 `;

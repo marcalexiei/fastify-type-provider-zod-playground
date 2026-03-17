@@ -8,9 +8,10 @@ import {
   createValidatorCompiler,
 } from '@marcalexiei/fastify-type-provider-zod';
 import Fastify from 'fastify';
-import z from 'zod';
+import type { FastifyInstance } from 'fastify';
+import { z } from 'zod';
 
-export async function createApp() {
+export async function createApp(): Promise<FastifyInstance> {
   const app = Fastify();
   app.setValidatorCompiler(createValidatorCompiler());
   app.setSerializerCompiler(createSerializerCompiler());
@@ -21,21 +22,19 @@ export async function createApp() {
     id: 'UserId',
   });
 
-  const UserSchema = z
-    .strictObject({ name: z.string().optional().default('Unknown') })
-    .meta({
-      description: 'User Data',
-      example: { name: 'Someone' },
-      id: 'User',
-    });
+  const UserSchema = z.strictObject({ name: z.string().optional().default('Unknown') }).meta({
+    description: 'User Data',
+    example: { name: 'Someone' },
+    id: 'User',
+  });
 
   await app.register(fastifySwagger, {
     openapi: {
-      openapi: '3.1.0',
       info: {
         title: 'SampleApi',
         version: '1.0.1',
       },
+      openapi: '3.1.0',
       servers: [],
     },
     transform: createJsonSchemaTransform(),
@@ -43,33 +42,33 @@ export async function createApp() {
   });
 
   await app.register(fastifySwaggerUI, {
-    routePrefix: '/documentation',
+    routePrefix: '/docs',
   });
 
   app.withTypeProvider<ZodTypeProvider>().route({
+    handler: (_req, res) => {
+      res.send({ baz: '', user: {} });
+    },
     method: 'POST',
-    url: '/login',
     schema: {
+      body: z.object({
+        userId: UserIdSchema,
+      }),
       querystring: z.object({
         baz: z.string().meta({
           description: 'query string example',
           example: 'wiiiiiiiiii',
         }),
       }),
-      body: z.object({
-        userId: UserIdSchema,
-      }),
       response: {
         200: z.object({
           baz: z.string(),
-          userId: UserIdSchema,
           user: UserSchema,
+          userId: UserIdSchema,
         }),
       },
     },
-    handler: (_, res) => {
-      res.send({} as never);
-    },
+    url: '/login',
   });
 
   await app.ready();
