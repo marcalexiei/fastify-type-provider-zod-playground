@@ -9,11 +9,11 @@
     "dev": "node --watch src/index.ts",
     "test": "vitest",
     "test:update": "vitest -u",
-    "lint": "biome lint .",
+    "lint": "oxlint .",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@fastify/swagger": "9.6.1",
+    "@fastify/swagger": "9.7.0",
     "@marcalexiei/fastify-type-provider-zod": "catalog:default",
     "@scalar/fastify-api-reference": "catalog:default",
     "fastify": "catalog:default",
@@ -22,6 +22,6 @@
   },
   "devDependencies": {
     "@types/node": "catalog:default",
-    "vitest": "4.0.15"
+    "vitest": "4.1.0"
   }
 }

@@ -8,20 +8,21 @@ import {
 } from '@marcalexiei/fastify-type-provider-zod';
 import scalarAPIReference from '@scalar/fastify-api-reference';
 import Fastify from 'fastify';
-import z from 'zod';
+import type { FastifyInstance } from 'fastify';
+import { z } from 'zod';
 
-export async function createApp() {
+export async function createApp(): Promise<FastifyInstance> {
   const app = Fastify().withTypeProvider<ZodTypeProvider>();
   app.setValidatorCompiler(createValidatorCompiler());
   app.setSerializerCompiler(createSerializerCompiler());
 
   await app.register(fastifySwagger, {
     openapi: {
-      openapi: '3.1.0',
       info: {
         title: 'SampleApi',
         version: '1.0.1',
       },
+      openapi: '3.1.0',
       servers: [],
     },
     transform: createJsonSchemaTransform(),
@@ -29,42 +30,42 @@ export async function createApp() {
   });
 
   app.register(scalarAPIReference, {
-    routePrefix: '/docs',
     configuration: {
-      showDeveloperTools: 'never',
       defaultHttpClient: {
         clientKey: 'fetch',
         targetKey: 'node',
       },
+      showDeveloperTools: 'never',
     },
+    routePrefix: '/docs',
   });
 
   app.route({
+    handler: (_req, res) => {
+      res.send({ number: Math.random() });
+    },
     method: 'GET',
-    url: '/random',
     schema: {
       response: {
         200: z.object({ number: z.number() }),
       },
     },
-    handler: (_, res) => {
-      res.send({ number: Math.random() });
-    },
+    url: '/random',
   });
 
   app.route({
+    handler: (req, res) => {
+      res.send({ body: req.body, status: 'ok' });
+    },
     method: 'POST',
-    url: '/body-debug',
     schema: {
-      consumes: ['text/html', 'text/plain'],
       body: z.string(),
+      consumes: ['text/html', 'text/plain'],
       response: {
-        200: z.object({ status: z.literal('ok'), body: z.unknown() }),
+        200: z.object({ body: z.unknown(), status: z.literal('ok') }),
       },
     },
-    handler: (req, res) => {
-      res.send({ status: 'ok', body: req.body });
-    },
+    url: '/body-debug',
   });
 
   await app.ready();

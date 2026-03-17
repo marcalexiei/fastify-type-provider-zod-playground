@@ -5,8 +5,8 @@ describe('/body-debug', () => {
 
   it('works', async () => {
     const req = fetch(`${appBaseURL}/body-debug`, {
-      method: 'POST',
       body: 'test2',
+      method: 'POST',
     });
 
     const response = await req;
