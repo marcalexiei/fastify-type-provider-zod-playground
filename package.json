@@ -10,17 +10,18 @@
     "format": "oxfmt .",
     "format:check": "oxfmt . --check",
     "lint": "oxlint",
+    "lint:ci": "oxlint --format=github",
     "typecheck": "pnpm -r run typecheck",
     "test": "pnpm -r run test",
     "check-all": "pnpm run format && pnpm run lint && pnpm run typecheck && pnpm run test"
   },
   "devDependencies": {
     "@marcalexiei/oxfmt-config": "1.0.2",
-    "@marcalexiei/oxlint-config": "1.0.1",
+    "@marcalexiei/oxlint-config": "1.1.0",
     "oxfmt": "0.41.0",
     "oxlint": "1.56.0",
     "oxlint-tsgolint": "0.17.0",
     "typescript": "5.9.3"
   },
-  "packageManager": "pnpm@10.22.0+sha512.bf049efe995b28f527fd2b41ae0474ce29186f7edcb3bf545087bd61fbbebb2bf75362d1307fda09c2d288e1e499787ac12d4fcb617a974718a6051f2eee741c"
+  "packageManager": "pnpm@10.32.1+sha512.a706938f0e89ac1456b6563eab4edf1d1faf3368d1191fc5c59790e96dc918e4456ab2e67d613de1043d2e8c81f87303e6b40d4ffeca9df15ef1ad567348f2be"
 }
