@@ -90,7 +90,7 @@ export async function createApp(): Promise<FastifyInstance> {
         console.info(request.headers.get('signaturedata'));
         // request.headers.delete('signaturedata')
         request.headers.append('foo', 'bar');
-        console.info(Array.from(request.headers.entries()));
+        console.info([...request.headers.entries()]);
       },
     },
     routePrefix: '/docs',
@@ -122,7 +122,7 @@ export async function createApp(): Promise<FastifyInstance> {
         ...opts,
         limits: {
           fieldSize: MULTIPART_MAX_SIZE,
-          ...(opts?.limits ?? {}),
+          ...opts?.limits,
         },
       });
 
