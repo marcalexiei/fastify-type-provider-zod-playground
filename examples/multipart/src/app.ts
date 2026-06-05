@@ -31,8 +31,8 @@ export async function createApp(): Promise<FastifyInstance> {
           method: req.method,
           url: req.url,
         },
-        error: 'Response Validation Error',
-        message: "Request doesn't match the schema",
+        error: 'Request Validation Error',
+        message: `Request ${err.validationContext} doesn't match the schema`,
         statusCode: 400,
       });
     }
@@ -45,7 +45,7 @@ export async function createApp(): Promise<FastifyInstance> {
           url: err.url,
         },
         error: 'Internal Server Error',
-        message: "Response doesn't match the schema",
+        message: `Response ${err.validationContext} doesn't match the schema`,
         statusCode: 500,
       });
     }
@@ -87,7 +87,6 @@ export async function createApp(): Promise<FastifyInstance> {
     configuration: {
       onBeforeRequest: async ({ request }) => {
         await Promise.resolve(1);
-        console.info(request.headers.get('signaturedata'));
         // request.headers.delete('signaturedata')
         request.headers.append('foo', 'bar');
         console.info([...request.headers.entries()]);
@@ -197,16 +196,16 @@ export async function createApp(): Promise<FastifyInstance> {
             }
           },
           z
-            .strictObject({ mood: z.array(z.string()) })
+            .strictObject({ isSomething: z.boolean(), mood: z.array(z.string()) })
             .optional()
             .describe('Options')
-            .default({ mood: [] }),
+            .default({ isSomething: false, mood: [] }),
         ),
         stringField: z.preprocess((input) => {
           // oxlint-disable-next-line no-console
           console.info('schema stringField', input);
           return input;
-        }, z.string().max(MULTIPART_MAX_SIZE).describe('html')),
+        }, z.string().max(MULTIPART_MAX_SIZE).describe('string field')),
       }),
       consumes: ['multipart/form-data'],
     },
