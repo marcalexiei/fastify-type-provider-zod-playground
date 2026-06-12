@@ -165,6 +165,7 @@ export async function createApp(): Promise<FastifyInstance> {
   });
 
   app.route({
+    url: '/testing-multi-part',
     handler: (req, res) => {
       const bodyKeysType: Partial<Record<string, string>> = {};
       for (const [name, value] of Object.entries(req.body)) {
@@ -209,7 +210,6 @@ export async function createApp(): Promise<FastifyInstance> {
       }),
       consumes: ['multipart/form-data'],
     },
-    url: '/testing-multi-part',
   });
 
   return app;

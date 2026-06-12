@@ -2,11 +2,19 @@ packages:
   - ./examples/**
 
 catalog:
+  '@fastify/multipart': 9.4.0
+  '@fastify/swagger': 9.7.0
   '@marcalexiei/fastify-type-provider-zod': 3.0.0
-  '@scalar/fastify-api-reference': 1.49.0
+  '@scalar/fastify-api-reference': 1.59.3
   '@types/node': 25.5.0
   fastify: 5.8.5
+  'swagger-themes': 1.4.3
   zod: 4.3.6
 
-ignoredBuiltDependencies:
-  - esbuild
+minimumReleaseAge: 1440
+minimumReleaseAgeStrict: true
+minimumReleaseAgeExclude:
+  - '@scalar/client-side-rendering@0.2.3'
+  - '@scalar/fastify-api-reference@1.59.3'
+  - '@scalar/schemas@0.4.3'
+  - '@scalar/types@0.13.3'

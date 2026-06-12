@@ -13,8 +13,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@fastify/multipart": "9.4.0",
-    "@fastify/swagger": "9.7.0",
+    "@fastify/multipart": "catalog:default",
+    "@fastify/swagger": "catalog:default",
     "@marcalexiei/fastify-type-provider-zod": "catalog:default",
     "@scalar/fastify-api-reference": "catalog:default",
     "fastify": "catalog:default",

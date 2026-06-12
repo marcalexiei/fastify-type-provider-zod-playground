@@ -13,11 +13,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@fastify/swagger": "9.7.0",
+    "@fastify/swagger": "catalog:default",
     "@marcalexiei/fastify-type-provider-zod": "catalog:default",
     "@scalar/fastify-api-reference": "catalog:default",
     "fastify": "catalog:default",
-    "swagger-themes": "1.4.3",
+    "swagger-themes": "catalog:default",
     "zod": "catalog:default"
   },
   "devDependencies": {
