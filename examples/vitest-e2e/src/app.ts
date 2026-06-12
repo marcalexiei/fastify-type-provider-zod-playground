@@ -41,22 +41,20 @@ export async function createApp(): Promise<FastifyInstance> {
   });
 
   app.route({
-    handler: (_req, res) => {
-      res.send({ number: Math.random() });
-    },
+    url: '/random',
     method: 'GET',
     schema: {
       response: {
         200: z.object({ number: z.number() }),
       },
     },
-    url: '/random',
+    handler: (_req, res) => {
+      res.send({ number: Math.random() });
+    },
   });
 
   app.route({
-    handler: (req, res) => {
-      res.send({ body: req.body, status: 'ok' });
-    },
+    url: '/body-debug',
     method: 'POST',
     schema: {
       body: z.string(),
@@ -65,7 +63,9 @@ export async function createApp(): Promise<FastifyInstance> {
         200: z.object({ body: z.unknown(), status: z.literal('ok') }),
       },
     },
-    url: '/body-debug',
+    handler: (req, res) => {
+      res.send({ body: req.body, status: 'ok' });
+    },
   });
 
   await app.ready();

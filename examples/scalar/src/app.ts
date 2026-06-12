@@ -79,9 +79,7 @@ export async function createApp(): Promise<FastifyInstance> {
   });
 
   app.route({
-    handler: (req, res) => {
-      res.send({ baz: 'asd', user: {}, userId: req.body.userId });
-    },
+    url: '/login',
     method: 'POST',
     schema: {
       body: z.object({
@@ -101,28 +99,13 @@ export async function createApp(): Promise<FastifyInstance> {
         }),
       },
     },
-    url: '/login',
+    handler: (req, res) => {
+      res.send({ baz: 'asd', user: {}, userId: req.body.userId });
+    },
   });
 
   app.route({
-    handler: (req, res) => {
-      res.send({ body: req.body, status: 'ok' });
-    },
-    method: 'POST',
-    schema: {
-      body: z.string(),
-      consumes: ['text/html', 'text/plain'],
-      response: {
-        200: z.object({ body: z.unknown(), status: z.literal('ok') }),
-      },
-    },
     url: '/without-trailing-slash',
-  });
-
-  app.route({
-    handler: (req, res) => {
-      res.send({ body: req.body, status: 'ok' });
-    },
     method: 'POST',
     schema: {
       body: z.string(),
@@ -131,7 +114,24 @@ export async function createApp(): Promise<FastifyInstance> {
         200: z.object({ body: z.unknown(), status: z.literal('ok') }),
       },
     },
+    handler: (req, res) => {
+      res.send({ body: req.body, status: 'ok' });
+    },
+  });
+
+  app.route({
     url: '/with-trailing-slash/',
+    method: 'POST',
+    schema: {
+      body: z.string(),
+      consumes: ['text/html', 'text/plain'],
+      response: {
+        200: z.object({ body: z.unknown(), status: z.literal('ok') }),
+      },
+    },
+    handler: (req, res) => {
+      res.send({ body: req.body, status: 'ok' });
+    },
   });
 
   await app.ready();

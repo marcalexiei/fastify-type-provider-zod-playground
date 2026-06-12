@@ -166,18 +166,6 @@ export async function createApp(): Promise<FastifyInstance> {
 
   app.route({
     url: '/testing-multi-part',
-    handler: (req, res) => {
-      const bodyKeysType: Partial<Record<string, string>> = {};
-      for (const [name, value] of Object.entries(req.body)) {
-        bodyKeysType[name] = typeof value;
-      }
-
-      res.send({
-        body: req.body,
-        bodyKeysType,
-        status: 'ok',
-      });
-    },
     method: 'POST',
     schema: {
       body: z.object({
@@ -209,6 +197,18 @@ export async function createApp(): Promise<FastifyInstance> {
         }, z.string().max(MULTIPART_MAX_SIZE).describe('string field')),
       }),
       consumes: ['multipart/form-data'],
+    },
+    handler: (req, res) => {
+      const bodyKeysType: Partial<Record<string, string>> = {};
+      for (const [name, value] of Object.entries(req.body)) {
+        bodyKeysType[name] = typeof value;
+      }
+
+      res.send({
+        body: req.body,
+        bodyKeysType,
+        status: 'ok',
+      });
     },
   });
 

@@ -1,5 +1,4 @@
 import fastifySwagger from '@fastify/swagger';
-import fastifySwaggerUI from '@fastify/swagger-ui';
 import type { ZodTypeProvider } from '@marcalexiei/fastify-type-provider-zod';
 import {
   createJsonSchemaTransform,
@@ -7,6 +6,7 @@ import {
   createSerializerCompiler,
   createValidatorCompiler,
 } from '@marcalexiei/fastify-type-provider-zod';
+import scalarAPIReference from '@scalar/fastify-api-reference';
 import Fastify from 'fastify';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
@@ -41,14 +41,19 @@ export async function createApp(): Promise<FastifyInstance> {
     transformObject: createJsonSchemaTransformObject(),
   });
 
-  await app.register(fastifySwaggerUI, {
+  app.register(scalarAPIReference, {
+    configuration: {
+      defaultHttpClient: {
+        clientKey: 'fetch',
+        targetKey: 'node',
+      },
+      showDeveloperTools: 'never',
+    },
     routePrefix: '/docs',
   });
 
   app.withTypeProvider<ZodTypeProvider>().route({
-    handler: (_req, res) => {
-      res.send({ baz: '', user: {} });
-    },
+    url: '/login',
     method: 'POST',
     schema: {
       body: z.object({
@@ -68,7 +73,9 @@ export async function createApp(): Promise<FastifyInstance> {
         }),
       },
     },
-    url: '/login',
+    handler: (_req, res) => {
+      res.send({ baz: '', user: {} });
+    },
   });
 
   await app.ready();

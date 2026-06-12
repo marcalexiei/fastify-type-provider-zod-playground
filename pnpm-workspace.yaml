@@ -8,7 +8,6 @@ catalog:
   '@scalar/fastify-api-reference': 1.59.3
   '@types/node': 25.5.0
   fastify: 5.8.5
-  'swagger-themes': 1.4.3
   zod: 4.3.6
 
 minimumReleaseAge: 1440

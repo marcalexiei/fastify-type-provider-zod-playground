@@ -17,7 +17,6 @@
     "@marcalexiei/fastify-type-provider-zod": "catalog:default",
     "@scalar/fastify-api-reference": "catalog:default",
     "fastify": "catalog:default",
-    "swagger-themes": "catalog:default",
     "zod": "catalog:default"
   },
   "devDependencies": {
