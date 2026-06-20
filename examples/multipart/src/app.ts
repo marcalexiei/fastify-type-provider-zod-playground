@@ -1,3 +1,6 @@
+import { createHash } from 'node:crypto';
+import { Transform } from 'node:stream';
+
 import type { Multipart, MultipartValue } from '@fastify/multipart';
 import fastifyMultipart from '@fastify/multipart';
 import fastifySwagger from '@fastify/swagger';
@@ -86,9 +89,13 @@ export async function createApp(): Promise<FastifyInstance> {
   await app.register(scalarAPIReference, {
     configuration: {
       onBeforeRequest: async ({ request }) => {
-        await Promise.resolve(1);
-        // request.headers.delete('signaturedata')
-        request.headers.append('foo', 'bar');
+        // Sign the raw request body so `/testing-body-hash` can verify it
+        const clone = request.clone();
+        const bytes = await clone.arrayBuffer();
+        const digest = await crypto.subtle.digest('SHA-256', bytes);
+        const hash = btoa(String.fromCodePoint(...new Uint8Array(digest)));
+        request.headers.append('testing-body-hash', hash);
+
         console.info([...request.headers.entries()]);
       },
     },
@@ -208,6 +215,70 @@ export async function createApp(): Promise<FastifyInstance> {
         body: req.body,
         bodyKeysType,
         status: 'ok',
+      });
+    },
+  });
+
+  // Raw request bytes captured during `preParsing`, keyed by request so the
+  // multipart parser can still consume the (teed) stream afterwards.
+  const rawBodyByRequest = new WeakMap<object, Buffer>();
+
+  app.route({
+    url: '/testing-body-hash',
+    method: 'POST',
+    // Tee the incoming payload so we can hash the exact raw bytes while still
+    // letting the multipart content-type parser read the stream.
+    preParsing: (req, _res, payload) => {
+      const chunks: Array<Buffer> = [];
+      const recorder = new Transform({
+        flush(callback): void {
+          rawBodyByRequest.set(req, Buffer.concat(chunks));
+          callback();
+        },
+        transform(chunk: Buffer, _encoding, callback): void {
+          chunks.push(Buffer.from(chunk));
+          callback(null, chunk);
+        },
+      });
+
+      return Promise.resolve(payload.pipe(recorder));
+    },
+    schema: {
+      body: z.object({
+        data: z
+          .string()
+          .default('1')
+          .describe('Multipart field included so the request carries a body to hash'),
+        somethingElse: z.string().default('2'),
+      }),
+      consumes: ['multipart/form-data'],
+      headers: z.looseObject({
+        'testing-body-hash': z
+          .string()
+          .describe(
+            'Base64-encoded SHA-256 digest of the raw request body, computed by the client',
+          ),
+      }),
+      response: {
+        200: z.object({
+          match: z.boolean().describe('Whether the provided and server hashes are equal'),
+          providedHash: z.string().describe('Hash received from the client'),
+          serverHash: z
+            .string()
+            .describe('Hash computed by the server from the raw request body bytes'),
+        }),
+      },
+    },
+    handler: (req, res) => {
+      const providedHash = req.headers['testing-body-hash'];
+      const rawBody = rawBodyByRequest.get(req) ?? Buffer.alloc(0);
+      // base64 digest to match the client's `btoa(...sha256 bytes)`
+      const serverHash = createHash('sha256').update(rawBody).digest('base64');
+
+      res.send({
+        match: providedHash === serverHash,
+        providedHash,
+        serverHash,
       });
     },
   });
