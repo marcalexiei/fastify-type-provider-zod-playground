@@ -5,7 +5,7 @@ catalog:
   '@fastify/multipart': 9.4.0
   '@fastify/swagger': 9.7.0
   '@marcalexiei/fastify-type-provider-zod': 3.0.0
-  '@scalar/fastify-api-reference': 1.49.0
+  '@scalar/fastify-api-reference': 1.61.0
   '@types/node': 25.5.0
   fastify: 5.8.5
   zod: 4.3.6
@@ -13,7 +13,7 @@ catalog:
 minimumReleaseAge: 1440
 minimumReleaseAgeStrict: true
 minimumReleaseAgeExclude:
-  - '@scalar/client-side-rendering@0.2.3'
-  - '@scalar/fastify-api-reference@1.59.3'
-  - '@scalar/schemas@0.4.3'
-  - '@scalar/types@0.13.3'
+  - '@scalar/client-side-rendering@0.2.5'
+  - '@scalar/fastify-api-reference@1.61.0'
+  - '@scalar/schemas@0.6.0'
+  - '@scalar/types@0.15.0'

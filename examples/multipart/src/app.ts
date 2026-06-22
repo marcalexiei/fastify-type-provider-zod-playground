@@ -17,7 +17,22 @@ import fastify from 'fastify';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 
-export const MULTIPART_MAX_SIZE = 10 * 1024;
+const preprocessJSON = (input: unknown): unknown => {
+  // oxlint-disable-next-line no-console
+  console.info('schema jsonField', input);
+  try {
+    // Consider using a safer alternative
+    if (typeof input === 'string') {
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+      return JSON.parse(input) as Record<string, unknown>;
+    }
+    return input;
+  } catch {
+    return input;
+  }
+};
+
+const MULTIPART_MAX_SIZE = 10 * 1024;
 
 // oxlint-disable-next-line max-lines-per-function
 export async function createApp(): Promise<FastifyInstance> {
@@ -88,7 +103,7 @@ export async function createApp(): Promise<FastifyInstance> {
 
   await app.register(scalarAPIReference, {
     configuration: {
-      onBeforeRequest: async ({ request }) => {
+      onRequestBuilt: async ({ request }) => {
         // Sign the raw request body so `/testing-body-hash` can verify it
         const clone = request.clone();
         const bytes = await clone.arrayBuffer();
@@ -177,20 +192,7 @@ export async function createApp(): Promise<FastifyInstance> {
     schema: {
       body: z.object({
         jsonField: z.preprocess(
-          (input) => {
-            // oxlint-disable-next-line no-console
-            console.info('schema jsonField', input);
-            try {
-              // Consider using a safer alternative
-              if (typeof input === 'string') {
-                // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-                return JSON.parse(input) as Record<string, unknown>;
-              }
-              return input;
-            } catch {
-              return input;
-            }
-          },
+          preprocessJSON,
           z
             .strictObject({ isSomething: z.boolean(), mood: z.array(z.string()) })
             .optional()
@@ -245,27 +247,37 @@ export async function createApp(): Promise<FastifyInstance> {
     },
     schema: {
       body: z.object({
-        data: z
-          .string()
-          .default('1')
-          .describe('Multipart field included so the request carries a body to hash'),
-        somethingElse: z.string().default('2'),
+        jsonField: z.preprocess(
+          preprocessJSON,
+          z
+            .strictObject({ isSomething: z.boolean(), mood: z.array(z.string()) })
+            .optional()
+            .describe('Options')
+            .default({ isSomething: false, mood: [] }),
+        ),
+        stringField: z.preprocess((input) => {
+          // oxlint-disable-next-line no-console
+          console.info('schema stringField', input);
+          return input;
+        }, z.string().max(MULTIPART_MAX_SIZE).describe('string field')),
       }),
       consumes: ['multipart/form-data'],
       headers: z.looseObject({
-        'testing-body-hash': z
-          .string()
-          .describe(
+        'testing-body-hash': z.string().meta({
+          description:
             'Base64-encoded SHA-256 digest of the raw request body, computed by the client',
-          ),
+        }),
       }),
       response: {
         200: z.object({
-          match: z.boolean().describe('Whether the provided and server hashes are equal'),
-          providedHash: z.string().describe('Hash received from the client'),
+          match: z
+            .boolean()
+            .meta({ description: 'Whether the provided and server hashes are equal' }),
+          providedHash: z.string().meta({ description: 'Hash received from the client' }),
           serverHash: z
             .string()
-            .describe('Hash computed by the server from the raw request body bytes'),
+            .meta({ description: 'Hash computed by the server from the raw request body bytes' }),
+          receivedBody: z.looseObject({}).meta({ description: 'Body received from the server' }),
         }),
       },
     },
@@ -279,6 +291,7 @@ export async function createApp(): Promise<FastifyInstance> {
         match: providedHash === serverHash,
         providedHash,
         serverHash,
+        receivedBody: req.body,
       });
     },
   });
