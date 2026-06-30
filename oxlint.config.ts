@@ -12,5 +12,6 @@ export default defineConfig({
   },
   rules: {
     'no-console': 'off',
+    'unicorn/max-nested-calls': 'off',
   },
 });
