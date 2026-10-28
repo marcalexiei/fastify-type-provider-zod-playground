@@ -230,7 +230,7 @@ export async function createApp(): Promise<FastifyInstance> {
     method: 'POST',
     // Tee the incoming payload so we can hash the exact raw bytes while still
     // letting the multipart content-type parser read the stream.
-    preParsing: (req, _res, payload) => {
+    preParsing: async (req, _res, payload) => {
       const chunks: Array<Buffer> = [];
       const recorder = new Transform({
         flush(callback): void {
