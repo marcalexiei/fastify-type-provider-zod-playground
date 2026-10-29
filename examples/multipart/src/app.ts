@@ -18,12 +18,10 @@ import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 
 const preprocessJSON = (input: unknown): unknown => {
-  // oxlint-disable-next-line no-console
   console.info('schema jsonField', input);
   try {
     // Consider using a safer alternative
     if (typeof input === 'string') {
-      // oxlint-disable-next-line typescript/no-unsafe-type-assertion
       return JSON.parse(input) as Record<string, unknown>;
     }
     return input;
@@ -125,7 +123,6 @@ export async function createApp(): Promise<FastifyInstance> {
     },
     async onFile(part) {
       const buffer = await part.toBuffer();
-      // oxlint-disable-next-line typescript/no-unsafe-type-assertion
       (part as unknown as MultipartValue).value = buffer.toString();
     },
   });
@@ -200,7 +197,6 @@ export async function createApp(): Promise<FastifyInstance> {
             .default({ isSomething: false, mood: [] }),
         ),
         stringField: z.preprocess((input) => {
-          // oxlint-disable-next-line no-console
           console.info('schema stringField', input);
           return input;
         }, z.string().max(MULTIPART_MAX_SIZE).describe('string field')),
@@ -256,7 +252,6 @@ export async function createApp(): Promise<FastifyInstance> {
             .default({ isSomething: false, mood: [] }),
         ),
         stringField: z.preprocess((input) => {
-          // oxlint-disable-next-line no-console
           console.info('schema stringField', input);
           return input;
         }, z.string().max(MULTIPART_MAX_SIZE).describe('string field')),

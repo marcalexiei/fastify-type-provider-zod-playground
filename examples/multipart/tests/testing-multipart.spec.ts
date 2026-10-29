@@ -6,7 +6,6 @@ import type { FastifyInstance } from 'fastify';
 import { createApp } from '../src/app.ts';
 
 const port = 5173;
-// oxlint-disable-next-line init-declarations
 let app: FastifyInstance;
 
 before(async () => {
@@ -27,7 +26,6 @@ void describe('file', () => {
     form.append('stringField', new Blob(['ciao']));
 
     const res = await fetch(SERVER_URL, { body: form, method: 'POST' });
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const json = (await res.json()) as Record<string, unknown>;
 
     assert.equal(res.status, 200);
@@ -39,7 +37,6 @@ void describe('file', () => {
     form.append('stringField', new Blob(['x'.repeat(100_000)]));
 
     const res = await fetch(SERVER_URL, { body: form, method: 'POST' });
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const json = (await res.json()) as Record<string, unknown>;
 
     assert.equal(res.status, 413);
@@ -54,7 +51,6 @@ void describe('field', () => {
     form.append('stringField', html);
 
     const res = await fetch(SERVER_URL, { body: form, method: 'POST' });
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const json = (await res.json()) as Record<string, unknown>;
 
     assert.equal(res.status, 200);
@@ -67,7 +63,6 @@ void describe('field', () => {
     form.append('stringField', html);
 
     const res = await fetch(SERVER_URL, { body: form, method: 'POST' });
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const json = (await res.json()) as Record<string, unknown>;
 
     assert.equal(res.status, 413);
@@ -88,7 +83,6 @@ void describe('body', () => {
       },
       method: 'POST',
     });
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const json = (await res.json()) as Record<string, unknown>;
 
     assert.equal(res.status, 200);
@@ -107,7 +101,6 @@ void describe('body', () => {
       },
       method: 'POST',
     });
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const json = (await res.json()) as Record<string, unknown>;
 
     assert.equal(res.status, 400);

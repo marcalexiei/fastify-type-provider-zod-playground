@@ -5,7 +5,6 @@ import type { FastifyInstance } from 'fastify';
 import { createApp } from './app.ts';
 
 void describe('openAPI 3.1 description and examples', () => {
-  // oxlint-disable-next-line init-declarations
   let app: FastifyInstance;
   before(async () => {
     app = await createApp();
