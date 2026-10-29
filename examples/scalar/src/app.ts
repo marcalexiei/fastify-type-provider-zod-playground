@@ -11,7 +11,6 @@ import Fastify from 'fastify';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 
-// oxlint-disable-next-line max-lines-per-function
 export async function createApp(): Promise<FastifyInstance> {
   const app = Fastify().withTypeProvider<ZodTypeProvider>();
   app.setValidatorCompiler(createValidatorCompiler());

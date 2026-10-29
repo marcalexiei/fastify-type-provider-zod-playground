@@ -10,7 +10,6 @@ describe('/random', () => {
 
     const response = await req;
     await expect(response.json()).resolves.toMatchObject({
-      // oxlint-disable-next-line typescript/no-unsafe-type-assertion
       number: expect.any(Number) as number,
     });
   });
