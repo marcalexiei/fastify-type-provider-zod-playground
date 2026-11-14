@@ -14,3 +14,5 @@ minimumReleaseAge: 1440
 minimumReleaseAgeStrict: true
 minimumReleaseAgeExclude:
   - '@marcalexiei/*'
+
+autoDedupe: true
