@@ -14,7 +14,7 @@
     "lint:ci": "oxlint --format=github",
     "typecheck": "pnpm -r run typecheck",
     "test": "pnpm -r run test",
-    "check-all": "pnpm run format && pnpm run lint && pnpm run typecheck && pnpm run test"
+    "validate": "pnpm run format && pnpm run lint && pnpm run typecheck && pnpm run test"
   },
   "devDependencies": {
     "@marcalexiei/oxfmt-config": "2.0.1",
